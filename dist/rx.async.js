@@ -338,12 +338,21 @@ Observable.fromNodeCallback = function (fn, ctx, selector) {
     this._e = e;
     this._n = n;
     this._fn = fn;
-    this._e.addEventListener(this._n, this._fn, false);
+    if (this._e.addEventListener) {
+      this._e.addEventListener(this._n, this._fn, false);
+    } else {
+      this._e.attachEvent('on' + this._n, this._fn);
+    }
     this.isDisposed = false;
   }
   ListenDisposable.prototype.dispose = function () {
     if (!this.isDisposed) {
-      this._e.removeEventListener(this._n, this._fn, false);
+      if (this._e.removeEventListener) {
+        this._e.removeEventListener(this._n, this._fn, false);
+      } else {
+        this._e.detachEvent('on' + this._n, this._fn);
+      }
+
       this.isDisposed = true;
     }
   };
